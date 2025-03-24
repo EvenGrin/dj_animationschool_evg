@@ -1,0 +1,67 @@
+{% load static %}
+<header class="sticky-top z-3  bg-primary">
+    <nav class="navbar navbar-expand-lg bg-body-primary" data-bs-theme="dark">
+        <div class="container-fluid">
+            <a class="navbar-brand" href="{% url 'home' %}">
+                <img src="{% static 'media/logo/logo.svg' %}"
+                     alt="А1002" height="35">
+            </a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse"
+                    data-bs-target="#navbarSupportedContent" aria-controls="navbarSupportedContent"
+                    aria-expanded="false" aria-label="Toggle navigation">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarSupportedContent">
+                <ul class="navbar-nav me-auto mb-lg-0 ">
+                    <li class="nav-item d-flex justify-content-center">
+                        <a class="nav-link text-white " aria-current="page" href="{% url 'home' %}">Главная</a>
+                    </li>
+                    <li class="nav-item d-flex justify-content-center">
+                        <a class="nav-link text-white " aria-current="page"
+                           href="{% url 'playlist' %}">Плейлисты</a>
+                    </li>
+                    {% if user.is_superuser %}
+
+                    <li class="nav-item d-flex justify-content-center">
+                        <a class="nav-link" href="{% url 'admin:index' %}" target="_blank">АдминПанель</a>
+                    </li>
+                    {% endif %}
+
+                </ul>
+                <ul class="navbar-nav ">
+                    {% if user.is_authenticated %}
+                    <li class="nav-item dropdown ">
+                        <button class="btn btn-primary dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false">
+                            {{ user.username }}
+                        </button>
+                        <ul class="dropdown-menu dropdown-menu-end">
+                            <li>
+                                <a class="dropdown-item" href="{% url 'user_history' %}">История</a>
+                            </li>
+                            <li>
+                                <a class="dropdown-item" href="{% url 'user_favourites' %}">Избранное</a>
+                            </li>
+                            <li>
+                                <hr class="dropdown-divider">
+                            </li>
+                            <li>
+                                <form action="{% url 'logout' %}" method="post">
+                                    {% csrf_token %}
+                                    <button type="submit" class="dropdown-item">Выход</button>
+                                </form>
+                            </li>
+                        </ul>
+                    </li>
+                    {% else %}
+                    <li class="nav-item">
+                        <a class="nav-link text-white px-2" href="{% url 'registration' %}">Регистрация</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link text-white" href="{% url 'login' %}">Войти</a>
+                    </li>
+                    {% endif %}
+                </ul>
+            </div>
+        </div>
+    </nav>
+</header>

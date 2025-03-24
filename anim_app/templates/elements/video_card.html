@@ -1,0 +1,33 @@
+{% load user_extras %}
+{% load humanize %}
+
+<div class="col col-sm-6 col-md-6 col-lg-4 col-xl-3 col-xxl-2">
+    <a href="{{video.get_absolute_url}}" class="text-dark link-underline link-underline-opacity-0">
+        <div class="card border-0 h-100" aria-hidden="true">
+            <div class="ratio ratio-16x9 w-100 border rounded-3  overflow-hidden position-relative card-img-top"
+                 >
+                <div>
+                    <img src="{{ video.thumbnail.url }}"
+                         class=" card-img-top img-fluid h-100 object-fit-cover"
+                         alt="обложка видео">
+                    <div>
+                        <span class="badge rounded-pill text-bg-dark bg-opacity-50 position-absolute bottom-0 end-0 m-2">{{video.duration}}</span>
+                    </div>
+                </div>
+            </div>
+
+
+            <div class="card-body px-0 pb-0 d-flex flex-column">
+                <h6 class="card-title m-0">
+                    <span class="text-lines-2">{{video.name}}</span>
+                </h6>
+                <p class="card-text">
+                    <span class="small text-nowrap">
+                        {{video.view_count}} {{video.view_count|ru_plural:"просмотр,просмотра,просмотров"}} ● {{video.date_published|naturaltime|truncate_naturaltime}}
+                    </span>
+                </p>
+            </div>
+        </div>
+    </a>
+</div>
+

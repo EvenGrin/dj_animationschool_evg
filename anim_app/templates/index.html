@@ -1,0 +1,13 @@
+{% extends 'base.html' %}
+{% block title %}Главная{% endblock %}
+{% block extra_head %}{% endblock %}
+{% block content %}
+<section class="mt-4">
+    <div class="row g-4 mx-0">
+        {% for video in videos %}
+        {% include 'elements/video_card.html' %}
+        {% endfor %}
+    </div>
+</section>
+{% endblock %}
+{% block extra_body %}{% endblock %}

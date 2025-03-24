@@ -1,0 +1,21 @@
+{% extends 'base.html' %}
+{% block title %}Плейлисты{% endblock %}
+{% block extra_head %}{% endblock %}
+{% block content %}
+<section class="container mt-4">
+    {% for playlist in playlists %}
+        <div class="border rounded-3 p-3 mb-3">
+        {% include 'elements/playlist_card.html' %}
+        {% for video in playlist.videos.all %}
+            {% include 'elements/playlist_video_card.html' %}
+        {% empty %}
+            {% include 'elements/danger.html' with text='Нет видео' %}
+        {% endfor %}
+        </div>
+    {% empty %}
+        {% include 'elements/danger.html' with text='Нет плейлистов' %}
+    {% endfor %}
+
+</section>
+{% endblock %}
+{% block extra_body %}{% endblock %}

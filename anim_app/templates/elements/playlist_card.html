@@ -1,0 +1,28 @@
+<a href="{{playlist.get_absolute_url}}" class="col link-underline link-underline-opacity-0">
+    <img src="{{playlist.thumbnail}}"
+         class="card-img-top img-fluid h-100 object-fit-cover" style="max-height: 170px;" alt="...">
+    <h1>{{playlist.name}}</h1>
+    <p> {{playlist.videos_count}} Видео</p>
+    <div class="card mb-3">
+        <div class="row row-cols-2 g-0">
+            <div class="col-md-4  border rounded-3 overflow-hidden position-relative">
+                <img class="card-img-top img-fluid h-100 object-fit-cover" style="max-height: 170px;" alt="..."
+                     src="{{playlist.thumbnail}}">
+                <span class="badge rounded-pill text-bg-dark bg-opacity-50 position-absolute bottom-0 end-0 m-2">
+            <i class="bi bi-collection-play"></i>
+            {{playlist.videos_count}}
+          </span>
+            </div>
+            <div class="col-md-8">
+                <div class="card-body">
+                    <h5 class="card-title">
+                        <span class="">{{playlist.name}}</span>
+                    </h5>
+                    <p class="card-text">
+                        <span class="">{{playlist.description}}</span>
+                    </p>
+                </div>
+            </div>
+        </div>
+    </div>
+</a>

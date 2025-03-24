@@ -1,0 +1,91 @@
+{% extends 'base.html' %}
+{% load user_extras %}
+{% load humanize %}
+{% block title %}{{video.name}}{% endblock %}
+{% block extra_head %}{% endblock %}
+{% block content %}
+<section class="row m-0">
+<section class="col ms-0">
+    <div>
+        {% if video %}
+        <video class="w-100 mt-2 bg-dark" style="max-height: 70vh  ;" poster="{{video.thumbnail.url}}"
+               autoplay="autoplay" loop="loop" controls="controls" tabindex="0" src="{{video.video_file.url}}"
+               type="video/mp4">
+            Ваш браузер не поддерживает воспроизведение видео.
+        </video>
+        <div class="row">
+            <div class="col">
+                <h1>{{video.name}}</h1>
+                <!-- описание -->
+                <div>
+                    <div>{{video.view_count}} {{video.view_count|ru_plural:"просмотр,просмотра,просмотров"}} ●
+                        {{video.date_published|naturaltime|truncate_naturaltime}}
+                    </div>
+                    <p>{{video.description}}</p>
+                </div>
+            </div>
+            <div class="col-3 ">
+                <button class="h-auto btn like btn-lg btn-light bg-secondary-subtle">
+                    <!--                        <i class="bi <?= $myClassSQL->get_data('`liked`', "id_user = '{$_SESSION['User']}' and id_video ='$id'")->num_rows > 0 ? 'bi-heart-fill text-danger' : 'bi-heart' ?>"></i>-->
+                    <i class="bi bi-heart"></i>
+                    <span>
+                            {{video.total_likes}}
+                        </span>
+                </button>
+
+                <button class="btn btn-lg btn-light bg-secondary-subtle">
+                    <i class="bi bi-eye"></i>
+                    {{video.view_count}}
+                </button>
+            </div>
+        </div>
+        {% else %}
+        danger($title);
+        {% endif %}
+    </div>
+    <!-- комментарии -->
+    <div>
+        {% if user.is_authenticated %}
+        <form method="post">
+            {% csrf_token %}
+            <div class="mb-3">
+                <label for="comment" class="form-label">Оставить комментарий:</label>
+                <textarea name="comment" id="comment" class="form-control" rows="5"></textarea>
+            </div>
+            <button type="submit" class="btn btn-primary">Отправить</button>
+        </form>
+        {% else %}
+        <div>Войдите чтоб оставлять комментарии</div>
+        {% endif %}
+        {% for comment in video.comments.all %}
+        <div>
+            <div>
+                {{comment.user}} {{comment.created_at}}
+            </div>
+            <div>
+                {{comment.text}}
+            </div>
+
+        </div>
+
+        {% endfor %}
+        <!--        <?php foreach ($myClassSQL->get_data('video', "1 ORDER BY `video`.`date_create` DESC ") as $row) { ?>-->
+        <!--            <a href="video.php?id=<?= $row['id'] ?>" class="col link-underline link-underline-opacity-0">-->
+        <!--                <?php video_playlist($row); ?>-->
+        <!--            </a>-->
+        <!--        <?php } ?>-->
+    </div>
+</section>
+<aside class="col-3">
+    {% for playlist in playlist %}
+        <h2>{{ playlist.name }}</h2>
+
+            {% for video in playlist.videos.all %}
+                {% include 'elements/playlist_video_card.html' %}
+            {% endfor %}
+
+    {% endfor %}
+</aside>
+</section>
+{% endblock %}
+{% block extra_body %}{% endblock %}
