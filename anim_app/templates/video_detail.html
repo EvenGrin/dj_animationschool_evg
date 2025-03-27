@@ -1,91 +1,155 @@
 {% extends 'base.html' %}
+{% load static %}
 {% load user_extras %}
 {% load humanize %}
 {% block title %}{{video.name}}{% endblock %}
 {% block extra_head %}{% endblock %}
 {% block content %}
-<section class="row m-0">
-<section class="col ms-0">
-    <div>
-        {% if video %}
-        <video class="w-100 mt-2 bg-dark" style="max-height: 70vh  ;" poster="{{video.thumbnail.url}}"
-               autoplay="autoplay" loop="loop" controls="controls" tabindex="0" src="{{video.video_file.url}}"
-               type="video/mp4">
-            Ваш браузер не поддерживает воспроизведение видео.
-        </video>
-        <div class="row">
-            <div class="col">
-                <h1>{{video.name}}</h1>
-                <!-- описание -->
-                <div>
-                    <div>{{video.view_count}} {{video.view_count|ru_plural:"просмотр,просмотра,просмотров"}} ●
-                        {{video.date_published|naturaltime|truncate_naturaltime}}
+<section class="row m-0 mt-3">
+    <!-- видео -->
+    <section class="col ms-0">
+        <div class="">
+            {% if video %}
+            <video
+                    class="w-100 bg-dark"
+                    style="max-height: 70vh;"
+                    poster="{{video.thumbnail.url}}"
+                    autoplay="autoplay"
+                    loop="loop"
+                    controls="controls"
+                    tabindex="0"
+                    src="{{video.video_file.url}}"
+                    type="video/mp4">
+                Ваш браузер не поддерживает воспроизведение видео.
+            </video>
+
+            <div class="row">
+                <div class="col">
+                    <h1>{{video.name}}</h1>
+                    <!-- описание -->
+                    <div>
+                        <div>{{video.view_count}} {{video.view_count|ru_plural:"просмотр,просмотра,просмотров"}} ●
+                            {{video.date_published|naturaltime|truncate_naturaltime}}
+                        </div>
+                        <p class="text-pre-line">{{video.description}}</p>
                     </div>
-                    <p>{{video.description}}</p>
                 </div>
-            </div>
-            <div class="col-3 ">
-                <button class="h-auto btn like btn-lg btn-light bg-secondary-subtle">
-                    <!--                        <i class="bi <?= $myClassSQL->get_data('`liked`', "id_user = '{$_SESSION['User']}' and id_video ='$id'")->num_rows > 0 ? 'bi-heart-fill text-danger' : 'bi-heart' ?>"></i>-->
-                    <i class="bi bi-heart"></i>
-                    <span>
+                <div class="col-3 ">
+                    <button class="h-auto btn like btn-lg btn-light bg-secondary-subtle">
+                        <i class="bi bi-heart"></i>
+                        <span>
                             {{video.total_likes}}
                         </span>
-                </button>
+                    </button>
 
-                <button class="btn btn-lg btn-light bg-secondary-subtle">
-                    <i class="bi bi-eye"></i>
-                    {{video.view_count}}
-                </button>
+                    <button class="btn btn-lg btn-light bg-secondary-subtle">
+                        <i class="bi bi-eye"></i>
+                        {{video.view_count}}
+                    </button>
+                </div>
             </div>
+            {% else %}
+            danger($title);
+            {% endif %}
         </div>
-        {% else %}
-        danger($title);
-        {% endif %}
-    </div>
-    <!-- комментарии -->
-    <div>
-        {% if user.is_authenticated %}
-        <form method="post">
-            {% csrf_token %}
-            <div class="mb-3">
-                <label for="comment" class="form-label">Оставить комментарий:</label>
-                <textarea name="comment" id="comment" class="form-control" rows="5"></textarea>
-            </div>
-            <button type="submit" class="btn btn-primary">Отправить</button>
-        </form>
-        {% else %}
-        <div>Войдите чтоб оставлять комментарии</div>
-        {% endif %}
-        {% for comment in video.comments.all %}
+        <!-- комментарии -->
         <div>
-            <div>
-                {{comment.user}} {{comment.created_at}}
+            <!-- Добавляем уникальный идентификатор для количества комментариев -->
+            <div class="d-flex justify-content-between flex-wrap">
+                <p>Комментариев:
+                    <span id="comments-count">{{ video.comments.all.count }}</span>
+                </p>
+                <button class="btn btn-primary button_toggle d-block d-lg-none" type="button" data-bs-toggle="collapse"
+                        data-bs-target="#comment_collapse" aria-expanded="false" aria-controls="collapseExample">
+                    <i class="bi bi-chevron-up"></i>
+                </button>
             </div>
-            <div>
-                {{comment.text}}
+            <div class="mb-3">
+                {% if user.is_authenticated %}
+                <form method="post" action="{% url 'create_comment' pk=video.id %}">
+                    {% csrf_token %}
+                    <div class="mb-3">
+                        <label for="comment" class="form-label">Оставить комментарий:</label>
+                        <textarea name="comment" id="comment" class="form-control" rows="5"></textarea>
+                    </div>
+                    <button type="submit" class="btn btn-primary">Отправить</button>
+                </form>
+                {% else %}
+                <div>Войдите чтоб оставлять комментарии</div>
+                {% endif %}
             </div>
+            <div class="collapse show" id="comment_collapse">
 
+                <!-- Добавляем уникальный идентификатор для контейнера комментариев -->
+                <div class="d-flex flex-column gap-2 py-2 " id="comments-container">
+                    {% for comment in video.comments.all|dictsortreversed:"created_at" %}
+                    <div class="border rounded-3 p-2">
+                        <div class="">
+                            <span class="fw-bold">{{ comment.user }}</span> <span class="text-secondary">
+                                {{comment.created_at|naturaltime|truncate_naturaltime }}
+                            </span>
+                        </div>
+                        <div class="ps-3">
+                            {{ comment.text }}
+                        </div>
+                    </div>
+                    {% empty %}
+                    Пока нет комментариев
+                    {% endfor %}
+                </div>
+
+            </div>
         </div>
-
-        {% endfor %}
-        <!--        <?php foreach ($myClassSQL->get_data('video', "1 ORDER BY `video`.`date_create` DESC ") as $row) { ?>-->
-        <!--            <a href="video.php?id=<?= $row['id'] ?>" class="col link-underline link-underline-opacity-0">-->
-        <!--                <?php video_playlist($row); ?>-->
-        <!--            </a>-->
-        <!--        <?php } ?>-->
-    </div>
-</section>
-<aside class="col-3">
-    {% for playlist in playlist %}
+    </section>
+    <!--  реки и плейлист  -->
+    <aside class="col-12 col-lg-3">
+        {% for playlist in playlist %}
         <h2>{{ playlist.name }}</h2>
 
-            {% for video in playlist.videos.all %}
-                {% include 'elements/playlist_video_card.html' %}
-            {% endfor %}
+        {% for video in playlist.videos.all %}
+        {% include 'elements/aside_video.html' %}
+        {% endfor %}
 
-    {% endfor %}
-</aside>
+        {% endfor %}
+        {% for video in video_list %}
+        {% include 'elements/aside_video.html' %}
+        {% endfor %}
+    </aside>
 </section>
 {% endblock %}
-{% block extra_body %}{% endblock %}
+{% block extra_body %}
+<script src="{% static 'js/comment_update.js' %}"></script>
+<script>
+    $(document).ready(function () {
+        $('.btn.like').click((e) => {
+            $.ajax({
+                url: "{% url 'like_video' pk=video.id %}",
+                method: 'get',
+                success: res => {
+
+                    if (res.is_auth) {
+                        console.log(res)
+                        $(e.currentTarget).find('i').toggleClass('bi-heart bi-heart-fill')
+                        $(e.currentTarget).find('span').html(res.count)
+                    } else {
+                        alert("Доступно для авторизованных")
+                    }
+
+                }
+        });
+
+    })
+})
+</script>
+<script>
+        function rewindVideo() {
+            var video = document.getElementById("myVideo");
+            if (video.currentTime > 10) { // Проверяем, есть ли хотя бы 10 секунд до начала видео
+                video.currentTime -= 10; // Перемещаем на 10 секунд назад
+            } else {
+                video.currentTime = 0; // Если меньше 10 секунд, перематываем в начало
+            }
+        }
+    </script>
+<script src="{% static 'js/like_video.js' %}"></script>
+{% endblock %}

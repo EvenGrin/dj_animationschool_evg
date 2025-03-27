@@ -39,5 +39,8 @@ urlpatterns = [
     # path('accounts/profile', ),
     path('accounts/history/', views.user_history, name='user_history'),
     path('accounts/favourites/', views.user_favourites, name='user_favourites'),
-    path('accounts/registration', views.registration, name='registration')
+    path('accounts/registration', views.registration, name='registration'),
+    #
+    path('video/<int:pk>/create_comment/', views.create_comment, name='create_comment'),
+    path('like_video/<int:pk>', views.like_video, name='like_video')
 ] + static(settings.MEDIA_URL, document_root = settings.MEDIA_ROOT)

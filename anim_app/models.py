@@ -1,9 +1,11 @@
 from django.contrib.auth.models import AbstractUser
-
+from django.core.validators import FileExtensionValidator
+from django.utils.text import slugify
 from django.db import models, transaction
 
 from django.urls import reverse
 
+from anim_app.validators import validate_file_extension
 
 
 class User(AbstractUser):
@@ -34,18 +36,44 @@ class Video(models.Model):
     description = models.TextField(verbose_name="Описание", null=True, blank=True)
     duration = models.DurationField(null=True, blank=True, editable=False, verbose_name="Продолжительность видео")
     date_published = models.DateTimeField(auto_now_add=True, verbose_name="Дата публикации")
-    category = models.ForeignKey(Category, on_delete=models.CASCADE, related_name='videos', verbose_name="Категория",
-                                 null=True, blank=True)
-    video_file = models.FileField(upload_to='videos/%Y/%m/%d/', verbose_name="Видео файл")
-    thumbnail = models.ImageField(upload_to='thumbnails/%Y/%m/%d/', verbose_name="Обложка видео")
-    likes = models.ManyToManyField(User, related_name='liked_videos', blank=True, verbose_name="Нравится")
-    dislikes = models.ManyToManyField(User, related_name='disliked_videos', blank=True, verbose_name="Не нравится")
+    category = models.ManyToManyField(
+        Category,
+        related_name='videos',
+        verbose_name="Категория",
+        blank=True,
+    )
+    video_file = models.FileField(
+        upload_to='videos/%Y/%m/%d/',
+        verbose_name="Видео файл",
+        validators=[FileExtensionValidator(allowed_extensions=["mp4"])]
+    )
+
+    thumbnail = models.ImageField(
+        upload_to='thumbnails/%Y/%m/%d/',
+        verbose_name="Обложка видео",
+        blank=True,
+        null=True,
+        default='thumbnails/thumbnail.png'
+    )
+    likes = models.ManyToManyField(
+        User,
+        related_name='liked_videos',
+        blank=True,
+        verbose_name="Нравится"
+    )
+    dislikes = models.ManyToManyField(
+        User,
+        related_name='disliked_videos',
+        blank=True,
+        verbose_name="Не нравится"
+    )
 
     class Meta:
         verbose_name = "Видео"
         verbose_name_plural = "Видео"
 
     def get_absolute_url(self):
+
         return reverse('video_detail', kwargs={'pk': self.pk})
 
     def total_likes(self):
@@ -55,7 +83,10 @@ class Video(models.Model):
         return self.dislikes.count()
 
     def average_rating(self):
-        return (self.total_likes() - self.total_dislikes()) / (self.total_likes() + self.total_dislikes())
+        if self.total_likes() == self.total_dislikes() == 0:
+            return 0
+        else:
+            return (self.total_likes() - self.total_dislikes()) / (self.total_likes() + self.total_dislikes())
 
     def view_count(self):
         return ViewHistory.objects.filter(video=self.pk).count()
