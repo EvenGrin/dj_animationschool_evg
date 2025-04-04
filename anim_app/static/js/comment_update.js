@@ -54,7 +54,7 @@ $(document).ready(function () {
                 if (data.success) {
                     console.log(data.comment)
                     // window.location.reload();
-                    $(document).find(`#comment_${data.comment.id} .comment_text`).html(data.comment.text).after(`<span class='small' >Изменён</span></br>`)
+                    $(document).find(`#comment_${data.comment.id} .comment_text`).html(data.comment.text + `</br><span class='small' >Изменён</span></br>`)
                     
                 } else {
                     alert('Произошла ошибка при редактировании комментария.');
