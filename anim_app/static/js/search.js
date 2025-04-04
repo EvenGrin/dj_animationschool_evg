@@ -3,9 +3,9 @@ $(document).ready(function(){
     let search_clear = $('#search_clear')
     search_clear.on('click', function(){
         search.val('')
+        search_clear.addClass('d-none')
     })
     if (search.val()){
-            console.log('21213')
             search_clear.removeClass('d-none')
         } else {
             search_clear.addClass('d-none')
