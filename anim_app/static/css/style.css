@@ -1,3 +1,17 @@
+@font-face {
+    font-family: 'Bahnshrift';
+    src: url(../fonts/Bahnschrift.ttf);
+}
+@font-face {
+    font-family: 'Roboto';
+    src: url(../fonts/Roboto-VariableFont_wdth\,wght.ttf)
+}
+body{
+    font-family: 'Bahnshrift', 'Roboto', var(--bs-body-font-family) !important;
+}
+.video_preload a div div {
+    transition: transform 0.3s ease-in-out;
+}
 .errorlist{
 margin:0;
 }
@@ -7,3 +21,26 @@ margin:0;
   -webkit-box-orient: vertical;
   overflow: hidden;
 }
+.text-pre{
+    white-space: pre;
+}
+.text-pre-wrap{
+    white-space: pre-wrap;
+}
+.text-pre-line{
+    white-space: pre-line;
+}
+@media (max-width: 767px) {
+            .mobile-sticky {
+                position: sticky;
+                top: 0; /* фиксируем видео сверху */
+                z-index: 10; /* устанавливаем высокий z-index, чтобы оно было поверх остального контента */
+            }
+        }
+
+        /* Для экранов шире 768px (например, планшеты и десктопы) */
+        @media (min-width: 768px) {
+            .desktop-static {
+                position: static; /* статическое положение */
+            }
+        }

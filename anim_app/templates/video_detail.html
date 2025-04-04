@@ -5,21 +5,38 @@
 {% block title %}{{video.name}}{% endblock %}
 {% block extra_head %}{% endblock %}
 {% block content %}
+<div class="modal fade" id="commentModal" data-bs-backdrop="static"  data-bs-keyboard="false" tabindex="-1" aria-labelledby="commentModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h1 class="modal-title fs-5" id="commentModalLabel">Изменить комментарий</h1>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <div class="edit-comment-form col-12">
+                    <form method="POST" action="{% url 'update_comment' %}" id="edit-comment-form">
+                        {% csrf_token %}
+                        <div class="mb-3">
+                            <input type="hidden" name="comment_id" value="" />
+                            <textarea class="form-control" name="new_text" rows="4" cols="50" required></textarea>
+                        </div>
+                        <button type="submit" class="btn btn-primary">Сохранить</button>
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Отмена</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
 <section class="row m-0 mt-3">
     <!-- видео -->
     <section class="col ms-0">
         <div class="">
             {% if video %}
-            <video
-                    class="w-100 bg-dark"
-                    style="max-height: 70vh;"
-                    poster="{{video.thumbnail.url}}"
-                    autoplay="autoplay"
-                    loop="loop"
-                    controls="controls"
-                    tabindex="0"
-                    src="{{video.video_file.url}}"
-                    type="video/mp4">
+            <video class="w-100 bg-dark" style="max-height: 70vh;" poster="{{video.thumbnail.url}}" autoplay="autoplay"
+                preload="auto" loop="loop" controls="controls" controlsList="nodownload" tabindex="0" data-setup="{}">
+                <source src="{% url 'stream' pk=video.pk %}" type="video/mp4">
+                <source src="{% url 'stream' pk=video.pk %}" type="video/webm">
                 Ваш браузер не поддерживает воспроизведение видео.
             </video>
 
@@ -27,25 +44,29 @@
                 <div class="col">
                     <h1>{{video.name}}</h1>
                     <!-- описание -->
-                    <div>
-                        <div>{{video.view_count}} {{video.view_count|ru_plural:"просмотр,просмотра,просмотров"}} ●
-                            {{video.date_published|naturaltime|truncate_naturaltime}}
-                        </div>
-                        <p class="text-pre-line">{{video.description}}</p>
-                    </div>
+
                 </div>
-                <div class="col-3 ">
-                    <button class="h-auto btn like btn-lg btn-light bg-secondary-subtle">
-                        <i class="bi bi-heart"></i>
+                <div class="col-auto">
+                    <button class="h-auto btn like  btn-light bg-secondary-subtle">
+                        <i
+                            class="bi {% if request.user in video.likes.all %}bi-heart-fill text-danger{% else%}bi-heart{% endif %}"></i>
                         <span>
                             {{video.total_likes}}
                         </span>
                     </button>
-
-                    <button class="btn btn-lg btn-light bg-secondary-subtle">
+                    <button class="h-auto btn dislike  btn-light bg-secondary-subtle">
+                        <i class="bi {% if request.user in video.dislikes.all %}bi-heartbreak-fill {% else%}bi-heartbreak{% endif %}"></i>
+                    </button>
+                    <button class="btn btn-light bg-secondary-subtle">
                         <i class="bi bi-eye"></i>
                         {{video.view_count}}
                     </button>
+                </div>
+                <div class="col-12">
+                    <div>{{video.view_count}} {{video.view_count|ru_plural:"просмотр,просмотра,просмотров"}} ●
+                        {{video.date_published|naturaltime|truncate_naturaltime}}
+                    </div>
+                    <p class="text-pre-line">{{video.description}}</p>
                 </div>
             </div>
             {% else %}
@@ -60,13 +81,13 @@
                     <span id="comments-count">{{ video.comments.all.count }}</span>
                 </p>
                 <button class="btn btn-primary button_toggle d-block d-lg-none" type="button" data-bs-toggle="collapse"
-                        data-bs-target="#comment_collapse" aria-expanded="false" aria-controls="collapseExample">
+                    data-bs-target="#comment_collapse" aria-expanded="false" aria-controls="collapseExample">
                     <i class="bi bi-chevron-up"></i>
                 </button>
             </div>
             <div class="mb-3">
                 {% if user.is_authenticated %}
-                <form method="post" action="{% url 'create_comment' pk=video.id %}">
+                <form id="comment-form" method="post" action="{% url 'create_comment' pk=video.id %}">
                     {% csrf_token %}
                     <div class="mb-3">
                         <label for="comment" class="form-label">Оставить комментарий:</label>
@@ -83,19 +104,43 @@
                 <!-- Добавляем уникальный идентификатор для контейнера комментариев -->
                 <div class="d-flex flex-column gap-2 py-2 " id="comments-container">
                     {% for comment in video.comments.all|dictsortreversed:"created_at" %}
-                    <div class="border rounded-3 p-2">
-                        <div class="">
-                            <span class="fw-bold">{{ comment.user }}</span> <span class="text-secondary">
-                                {{comment.created_at|naturaltime|truncate_naturaltime }}
-                            </span>
+                    <div class="border rounded-3 p-2 w-100 row m-0" id="comment_{{comment.id}}">
+                        <div class="col">
+                            <div class="">
+                                <span class="fw-bold">{{ comment.user }}</span> <span class="text-secondary">
+                                    {{comment.created_at|naturaltime|truncate_naturaltime }}
+                                </span>
+                            </div>
+                            <div class="ps-3 comment_text">{{ comment.text }}</div>
                         </div>
-                        <div class="ps-3">
-                            {{ comment.text }}
+                        {% if user == comment.user %}
+                        <div class="col-auto">
+                            <button class="btn" type="button" data-bs-toggle="dropdown" aria-expanded="false"><i
+                                    class="bi bi-three-dots-vertical"></i></button>
+                            <ul class="dropdown-menu">
+                                <li>
+
+                                    <button class="btn edit-comment-btn" data-id="{{ comment.id }}"
+                                        data-bs-toggle="modal" data-bs-target="#commentModal">
+                                        <i class="bi bi-pencil"></i>
+                                        Изменить
+                                    </button>
+                                </li>
+                                <li>
+                                    <button class="btn delete-comment-btn" data-id="{{ comment.id }}">
+                                        <i class="bi bi-trash"></i> Удалить
+                                    </button>
+                                </li>
+                            </ul>
                         </div>
+                        {% endif %}
+
+
                     </div>
                     {% empty %}
                     Пока нет комментариев
                     {% endfor %}
+
                 </div>
 
             </div>
@@ -126,30 +171,38 @@
                 url: "{% url 'like_video' pk=video.id %}",
                 method: 'get',
                 success: res => {
-
                     if (res.is_auth) {
                         console.log(res)
-                        $(e.currentTarget).find('i').toggleClass('bi-heart bi-heart-fill')
-                        $(e.currentTarget).find('span').html(res.count)
+                        $('.like i').toggleClass('bi-heart bi-heart-fill text-danger')
+                        $('.like span').html(res.total_likes)
+                        $('.dislike i').removeClass('bi-heartbreak-fill').addClass('bi-heartbreak')
                     } else {
                         alert("Доступно для авторизованных")
                     }
 
                 }
-        });
+            });
 
+        })
+        $('.btn.dislike').click((e) => {
+            $.ajax({
+                url: "{% url 'dislike_video' pk=video.id %}",
+                method: 'get',
+                success: res => {
+                    if (res.is_auth) {
+                        console.log(res)
+                        $('.dislike i').toggleClass('bi-heartbreak bi-heartbreak-fill')
+                        console.log(res.total_likes)
+                        $('.like  span').html(res.total_likes)
+                        $('.like i').removeClass('bi-heart-fill text-danger').addClass('bi-heart')
+                    } else {
+                        alert("Доступно для авторизованных")
+                    }
+
+                }
+            });
+
+        })
     })
-})
 </script>
-<script>
-        function rewindVideo() {
-            var video = document.getElementById("myVideo");
-            if (video.currentTime > 10) { // Проверяем, есть ли хотя бы 10 секунд до начала видео
-                video.currentTime -= 10; // Перемещаем на 10 секунд назад
-            } else {
-                video.currentTime = 0; // Если меньше 10 секунд, перематываем в начало
-            }
-        }
-    </script>
-<script src="{% static 'js/like_video.js' %}"></script>
 {% endblock %}

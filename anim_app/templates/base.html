@@ -8,8 +8,9 @@
     <link rel="stylesheet" href="{% static 'css/bootstrap.css' %}">
     <link rel="stylesheet" href="{% static 'css/bootstrap-icons-1.11.3/font/bootstrap-icons.css'%}">
     <link rel="stylesheet" href="{% static 'css/style.css' %}">
+    <link rel="stylesheet" href="{% static 'css/jquery-ui.css' %}">
     <script src="{% static 'js/jquery-3.7.1.js' %}"></script>
-
+    <script src="{% static 'js/jquery-ui.js' %}"></script>
     {% block extra_head %}{% endblock %}
 </head>
 <body>
@@ -19,6 +20,17 @@
 </main>
 
 <script src="{% static 'js/bootstrap.bundle.js' %}"></script>
+<script src="{% static 'js/search.js' %}"></script>
+<script>
+$( function() {
+    let availableTags = [
+    {% for video in search_video %}"{{video.name}}",{% endfor %}
+    ];
+    $( "#search" ).autocomplete({
+      source: availableTags
+    });
+  } );
+</script>
 {% block extra_body %}
 {% endblock %}
 </body>

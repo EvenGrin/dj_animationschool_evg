@@ -1,0 +1,27 @@
+{% extends 'base.html' %}
+{% load humanize %}
+{% load static %}
+{% block title %}История просмотров{% endblock %}
+{% block content %}
+<section class="container-xxl mt-4">
+    {% with history|first as v %}
+    <img src="{{v.video.thumbnail.url}}"
+         class="card-img-top img-fluid h-100 object-fit-cover" style="max-height: 170px;" alt="...">
+    {% endwith %}
+    <h1>История просмотров</h1>
+    <p>{{history.count}} Видео</p>
+    {% for h in history %}
+    <div class="bg-white rounded-2 overflow-hidden shadow-sm mt-3">
+        {% ifchanged %}
+        <div class="d-flex justify-content-between flex-wrap align-items-center border rounded-top ">
+            <p class="h2 px-3 py-2">{{ h.timestamp|naturalday }}</p>
+        </div>
+        {% endifchanged %}
+            <div
+                   class="col link-underline link-underline-opacity-0">
+                    {% include 'elements/playlist_video_card.html' with video=h.video %}
+            </div>
+    </div>
+    {% endfor %}
+</section>
+{% endblock %}

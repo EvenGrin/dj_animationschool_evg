@@ -1,7 +1,7 @@
 from django.contrib import admin
 from django.utils.html import format_html
 
-from .models import Category, Video, Comment, Playlist, Subscription, ViewHistory
+from .models import Category, Video, Comment, Playlist, Subscription, ViewHistory, User
 from moviepy import VideoFileClip
 
 
@@ -21,6 +21,7 @@ class VideoAdmin(admin.ModelAdmin):
     fields = ['name', 'description', "category", 'duration', 'video_file', 'thumbnail', 'video_tag']
     readonly_fields = ['duration', 'video_tag']
     filter_horizontal = ['category', ]
+    list_per_page = 5
 
     def total_likes(self, obj):
         return obj.total_likes()
@@ -48,16 +49,20 @@ class VideoAdmin(admin.ModelAdmin):
     category_list.short_description = 'Категория'
 
     def video_tag(self, obj):
-        return format_html("<video "
-                           "class='w-100 bg-dark' "
-                           "style='max-height: 70vh;' "
-                           f"poster='{obj.thumbnail.url}' "
-                           "autoplay='autoplay' "
-                           "loop='loop' "
-                           "controls='controls' "
-                           f"tabindex='0' src='{obj.video_file.url}'type='video/mp4'>"
-                           "Ваш браузер не поддерживает воспроизведение видео."
-                           "</video>")
+        return format_html(f"""
+        <video 
+        style="max-width: 100%;"
+        class='bg-dark' 
+        poster='{obj.thumbnail.url}'
+        autoplay='autoplay' 
+        loop='loop' 
+        controls='controls' 
+        tabindex='0'>
+        <source src="/stream/{obj.pk}/" type="video/mp4">
+        <source src="/stream/{obj.pk}/" type="video/webm">
+        Ваш браузер не поддерживает воспроизведение видео.
+        </video>
+        """)
 
     video_tag.short_description = 'Видео'
 
@@ -89,12 +94,13 @@ class PlaylistAdmin(admin.ModelAdmin):
     inlines = [VideoInlines]
 
 
-@admin.register(Subscription)
-class SubscriptionAdmin(admin.ModelAdmin):
-    list_display = ['user', 'category', 'video']
 
 
 @admin.register(ViewHistory)
 class ViewHistoryAdmin(admin.ModelAdmin):
     list_display = ['user', 'video', 'timestamp']
     list_filter = ['timestamp']
+
+@admin.register(User)
+class UserAdmin(admin.ModelAdmin):
+    list_display = ['username', 'surname','name','patronymic', 'email']

@@ -2,66 +2,92 @@
 <header class="sticky-top z-3  bg-primary">
     <nav class="navbar navbar-expand-lg bg-body-primary" data-bs-theme="dark">
         <div class="container-fluid">
-            <a class="navbar-brand" href="{% url 'home' %}">
+            <a class=" navbar-brand" href="{% url 'home' %}">
                 <img src="{% static 'media/logo/logo.svg' %}"
                      alt="А1002" height="35">
             </a>
-            <button class="navbar-toggler" type="button" data-bs-toggle="collapse"
-                    data-bs-target="#navbarSupportedContent" aria-controls="navbarSupportedContent"
-                    aria-expanded="false" aria-label="Toggle navigation">
+            <div class=" offcanvas offcanvas-end bg-primary" tabindex="-1" id="navbarSupportedContent"
+                 aria-labelledby="navbarOffcanvasLgLabel">
+                <div class="offcanvas-header border-light border-bottom border-opacity-10">
+                    <a class="navbar-brand" href="{% url 'home' %}">
+                        <img src="{% static 'media/logo/logo.svg' %}"
+                             alt="А1002" height="35">
+                    </a>
+                    <button type="button" class="btn-close" data-bs-dismiss="offcanvas" aria-label="Close"></button>
+                </div>
+                <div class="offcanvas-body">
+
+
+                    <ul class="navbar-nav me-auto mb-lg-0 ">
+                        <li class="nav-item d-flex justify-content-center">
+                            <a class="nav-link text-white " aria-current="page" href="{% url 'home' %}">Главная</a>
+                        </li>
+                        <li class="nav-item d-flex justify-content-center">
+                            <a class="nav-link text-white " aria-current="page"
+                               href="{% url 'playlist' %}">Плейлисты</a>
+                        </li>
+                        {% if user.is_superuser %}
+
+                        <li class="nav-item d-flex justify-content-center">
+                            <a class="nav-link" href="{% url 'admin:index' %}" target="_blank">АдминПанель</a>
+                        </li>
+                        {% endif %}
+
+                    </ul>
+
+                </div>
+
+            </div>
+            <form class="order-1 order-lg-0 w-100" action="{% url 'home' %}" method="get" id="search_form"  data-bs-theme="light">
+                <div class="input-group bg-white rounded-3 justify-content-center align-items-center">
+                    <input id="search" name="q" type="text" class="form-control border-0" placeholder="Поиск..."
+                           aria-label="Поиск" value="{% if search_query %}{{search_query}}{% endif %}">
+                    <button class="btn btn-primary border-white d-none" type="button" id="search_clear"><i
+                            class="bi bi-x"></i></button>
+                    <button class="btn btn-primary border-white" type="submit"><i class="bi bi-search p-2"></i></button>
+                </div>
+            </form>
+            <button class=" navbar-toggler border-0" type="button" data-bs-toggle="offcanvas"
+                    data-bs-target="#navbarSupportedContent" aria-controls="navbarOffcanvasLg"
+                    aria-label="Toggle navigation">
                 <span class="navbar-toggler-icon"></span>
             </button>
-            <div class="collapse navbar-collapse" id="navbarSupportedContent">
-                <ul class="navbar-nav me-auto mb-lg-0 ">
-                    <li class="nav-item d-flex justify-content-center">
-                        <a class="nav-link text-white " aria-current="page" href="{% url 'home' %}">Главная</a>
-                    </li>
-                    <li class="nav-item d-flex justify-content-center">
-                        <a class="nav-link text-white " aria-current="page"
-                           href="{% url 'playlist' %}">Плейлисты</a>
-                    </li>
-                    {% if user.is_superuser %}
+            <ul class=" navbar-nav">
+                {% if user.is_authenticated %}
+                <li class="nav-item dropdown position-relative">
+                    <button class="btn btn-primary dropdown-toggle" type="button" data-bs-toggle="dropdown"
+                            aria-expanded="false">
+                        {{ user.username }}
+                    </button>
+                    <ul class="dropdown-menu dropdown-menu-end position-absolute" data-bs-theme="light">
+                        <li>
+                            <a class="dropdown-item" href="{% url 'user_history' %}">История</a>
+                        </li>
+                        <li>
+                            <a class="dropdown-item" href="{% url 'user_favourites' %}">Понравившиеся</a>
+                        </li>
+                        <li>
+                            <hr class="dropdown-divider">
+                        </li>
+                        <li>
+                            <form action="{% url 'logout' %}" method="post">
+                                {% csrf_token %}
+                                <button type="submit" class="dropdown-item">Выход</button>
+                            </form>
+                        </li>
+                    </ul>
+                </li>
+                {% else %}
+                <li class="nav-item">
+                    <a class="nav-link text-white" href="{% url 'registration' %}">Регистрация</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link text-white" href="{% url 'login' %}">Войти</a>
+                </li>
+                {% endif %}
+            </ul>
 
-                    <li class="nav-item d-flex justify-content-center">
-                        <a class="nav-link" href="{% url 'admin:index' %}" target="_blank">АдминПанель</a>
-                    </li>
-                    {% endif %}
 
-                </ul>
-                <ul class="navbar-nav ">
-                    {% if user.is_authenticated %}
-                    <li class="nav-item dropdown ">
-                        <button class="btn btn-primary dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false">
-                            {{ user.username }}
-                        </button>
-                        <ul class="dropdown-menu dropdown-menu-end">
-                            <li>
-                                <a class="dropdown-item" href="{% url 'user_history' %}">История</a>
-                            </li>
-                            <li>
-                                <a class="dropdown-item" href="{% url 'user_favourites' %}">Избранное</a>
-                            </li>
-                            <li>
-                                <hr class="dropdown-divider">
-                            </li>
-                            <li>
-                                <form action="{% url 'logout' %}" method="post">
-                                    {% csrf_token %}
-                                    <button type="submit" class="dropdown-item">Выход</button>
-                                </form>
-                            </li>
-                        </ul>
-                    </li>
-                    {% else %}
-                    <li class="nav-item">
-                        <a class="nav-link text-white px-2" href="{% url 'registration' %}">Регистрация</a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link text-white" href="{% url 'login' %}">Войти</a>
-                    </li>
-                    {% endif %}
-                </ul>
-            </div>
         </div>
     </nav>
 </header>

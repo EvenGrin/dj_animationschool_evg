@@ -1,4 +1,5 @@
 {% extends 'base.html' %}
+{% load static %}
 {% block title %}Главная{% endblock %}
 {% block extra_head %}{% endblock %}
 {% block content %}
@@ -6,8 +7,12 @@
     <div class="row g-4 mx-0">
         {% for video in videos %}
         {% include 'elements/video_card.html' %}
+        {% empty %}
+        {% include 'elements/danger.html' with text='Видео не найдено' %}
         {% endfor %}
     </div>
 </section>
 {% endblock %}
-{% block extra_body %}{% endblock %}
+{% block extra_body %}
+<script src="{% static 'js/video_preload.js' %}"></script>
+{% endblock %}

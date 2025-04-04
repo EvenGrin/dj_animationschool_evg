@@ -19,7 +19,7 @@
                 {% for field in form %}
                 <div class="row mb-3 justify-content-between">
                     <div class="text-danger m-0">{{field.errors}}</div>
-                    <label for="{{field.id_for_label}}" class="col-sm-2 col-form-label">{{field.label}}</label>
+                    <label for="{{field.id_for_label}}" class="col-sm-5 col-form-label">{{field.label}}</label>
                     <div class="col-sm-7">
                         {{field|attr:"class:form-control"}}
                     </div>

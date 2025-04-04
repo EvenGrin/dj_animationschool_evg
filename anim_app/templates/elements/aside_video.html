@@ -10,7 +10,7 @@
     <div class="card mb-3 overflow-hidden">
         <div class="col">
             <div class="row row-cols-1 row-cols-md-2 g-0">
-                <div class="col col-md-4  overflow-hidden position-relative " >
+                <div class="col-12 col-sm-4 overflow-hidden position-relative " >
                     <div class="position-relative d-flex  bg-secondary overflow-hidden d-flex justify-content-center align-items-center h-100">
                         <img
                                 src="{{video.thumbnail.url}}"
@@ -24,7 +24,7 @@
                     <span
                             class="badge rounded-pill text-bg-dark bg-opacity-50 position-absolute bottom-0 end-0 m-2 z-1">{{video.duration}}</span>
                 </div>
-                <div class="col-md-8">
+                <div class="col-12 col-sm-8">
                     <div class="card-body">
                         <h6 class="card-title">
                         <span class=""
@@ -32,9 +32,6 @@
                             {{video.name}}
                         </span>
                         </h6>
-                        <p style="-webkit-line-clamp: 2;    display: -webkit-box;    -webkit-box-orient: vertical;    overflow: hidden;">
-                            {{video.description}}
-                        </p>
                         <p class="card-text small text-truncate">
                             {{video.date_published|naturaltime|truncate_naturaltime}} ● {{video.view_count}}
                             {{video.view_count|ru_plural:"просмотр,просмотра,просмотров"}}</p>

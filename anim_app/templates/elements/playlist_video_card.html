@@ -1,11 +1,17 @@
 {% load user_extras %}
 {% load humanize %}
-<a href="{% url 'playlist_video' pk=video.id pk_list=playlist.id %}" class="text-decoration-none">
-    <div class="card mb-3 overflow-hidden">
+<a href="{% if playlist.id %}
+{% url 'playlist_video' pk=video.id pk_list=playlist.id %}
+{% else %}
+{% url 'video_detail' pk=video.id %}
+{% endif%}"
+
+   class="text-decoration-none">
+    <div class="card overflow-hidden">
         <div class="col">
-            <div class="row row-cols-2 g-0">
-                <div class="col-md-4  overflow-hidden position-relative " style="max-height: 170px;">
-                    <div class="position-relative d-flex  bg-secondary overflow-hidden">
+            <div class="row row-cols-1 row-cols-md-2 g-0">
+                <div class="col col-md-3  overflow-hidden position-relative " style="max-height: 170px;">
+                    <div class="position-relative d-flex  bg-secondary overflow-hidden d-flex justify-content-center align-items-center h-100">
                         <img
                                 src="{{video.thumbnail.url}}"
                                 height="170"
@@ -13,7 +19,7 @@
                                 style="filter: blur(20px); transform: scale(1.1);" alt="image_{{video.id}}">
                         <img
                                 src="{{video.thumbnail.url}}"
-                                height="170" class="card-img-top object-fit-contain  z-1 "
+                                style="max-height: 170px" class="card-img-top object-fit-contain h-100 z-1 "
                                 alt="image_{{video.id}}">
                     </div>
                     <span
@@ -27,7 +33,9 @@
                             {{video.name}}
                         </span>
                         </h6>
-
+                        <p style="-webkit-line-clamp: 2;    display: -webkit-box;    -webkit-box-orient: vertical;    overflow: hidden;">
+                            {{video.description}}
+                        </p>
                         <p class="card-text small text-truncate">
                             {{video.date_published|naturaltime|truncate_naturaltime}} ● {{video.view_count}}
                             {{video.view_count|ru_plural:"просмотр,просмотра,просмотров"}}</p>

@@ -43,13 +43,13 @@ class Video(models.Model):
         blank=True,
     )
     video_file = models.FileField(
-        upload_to='videos/%Y/%m/%d/',
+        upload_to='videos/',
         verbose_name="Видео файл",
         validators=[FileExtensionValidator(allowed_extensions=["mp4"])]
     )
 
     thumbnail = models.ImageField(
-        upload_to='thumbnails/%Y/%m/%d/',
+        upload_to='thumbnails/',
         verbose_name="Обложка видео",
         blank=True,
         null=True,
