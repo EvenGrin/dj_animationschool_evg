@@ -1,6 +1,9 @@
 $(document).ready(function(){
     let search = $('#search')
     let search_clear = $('#search_clear')
+    search_clear.on('click', function(){
+        search.val('')
+    })
     if (search.val()){
             console.log('21213')
             search_clear.removeClass('d-none')
@@ -15,7 +18,5 @@ $(document).ready(function(){
             search_clear.addClass('d-none')
         }
     })
-    search_clear.on('click', function(){
-        search.val('')
-    })
+
 })
